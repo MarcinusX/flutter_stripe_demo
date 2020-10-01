@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_stripe_demo/checkout_page.dart';
-import 'package:flutter_stripe_demo/server_stub.dart';
+import 'package:flutter_stripe_demo/checkout/stripe_checkout.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,7 +14,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomePage(),
+      routes: {
+        '/': (_) => HomePage(),
+        '/success': (_) => SuccessPage(),
+      },
     );
   }
 }
@@ -23,26 +25,24 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Builder(
-        builder: (context) => Center(
-          child: RaisedButton(
-            onPressed: () async {
-              final sessionId = await Server().createCheckout();
-              final result = await Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => CheckoutPage(
-                  sessionId: sessionId,
-                ),
-              ));
-              Scaffold.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Result: $result'),
-                ),
-              );
-            },
-            child: Text('Pay!'),
-            color: Colors.blue,
-            textColor: Colors.white,
-          ),
+      body: Center(
+        child: RaisedButton(
+          onPressed: () => redirectToCheckout(context),
+          child: Text('Stripe Checkout in Flutter!'),
+        ),
+      ),
+    );
+  }
+}
+
+class SuccessPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(
+          'Success',
+          style: Theme.of(context).textTheme.headline1,
         ),
       ),
     );

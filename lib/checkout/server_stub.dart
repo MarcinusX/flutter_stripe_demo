@@ -18,8 +18,8 @@ class Server {
         }
       ],
       'mode': 'payment',
-      'success_url': 'https://success.com/{CHECKOUT_SESSION_ID}',
-      'cancel_url': 'https://cancel.com/',
+      'success_url': 'http://localhost:8080/#/success',
+      'cancel_url': 'http://localhost:8080/#/cancel',
     };
 
     try {

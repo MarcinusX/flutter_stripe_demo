@@ -1,8 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe_demo/checkout/server_stub.dart';
 import 'package:flutter_stripe_demo/constants.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+void redirectToCheckout(BuildContext context) async {
+  final sessionId = await Server().createCheckout();
+  Navigator.of(context).push(MaterialPageRoute(
+    builder: (_) => CheckoutPage(sessionId: sessionId),
+  ));
+}
 
 class CheckoutPage extends StatefulWidget {
   final String sessionId;
@@ -14,7 +22,7 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  WebViewController _controller;
+  WebViewController _webViewController;
 
   @override
   Widget build(BuildContext context) {
@@ -23,17 +31,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
       body: WebView(
         initialUrl: initialUrl,
         javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (controller) => _controller = controller,
+        onWebViewCreated: (webViewController) =>
+            _webViewController = webViewController,
         onPageFinished: (String url) {
           if (url == initialUrl) {
-            _redirectToStripe();
+            _redirectToStripe(widget.sessionId);
           }
         },
         navigationDelegate: (NavigationRequest request) {
-          if (request.url.startsWith('https://success.com')) {
-            Navigator.of(context).pop('success');
-          } else if (request.url.startsWith('https://cancel.com')) {
-            Navigator.of(context).pop('cancel');
+          if (request.url.startsWith('http://localhost:8080/#/success')) {
+            Navigator.of(context).pushReplacementNamed('/success');
+          } else if (request.url.startsWith('http://localhost:8080/#/cancel')) {
+            Navigator.of(context).pushReplacementNamed('/cancel');
           }
           return NavigationDecision.navigate;
         },
@@ -41,30 +50,31 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  void _redirectToStripe() {
+  String get initialUrl =>
+      'data:text/html;base64,${base64Encode(Utf8Encoder().convert(kStripeHtmlPage))}';
+
+  Future<String> _redirectToStripe(String sessionId) async {
     final redirectToCheckoutJs = '''
 var stripe = Stripe(\'$apiKey\');
     
 stripe.redirectToCheckout({
-  sessionId: '${widget.sessionId}'
+  sessionId: '$sessionId'
 }).then(function (result) {
   result.error.message = 'Error'
 });
 ''';
-    _controller.evaluateJavascript(redirectToCheckoutJs);
-  }
 
-  String get initialUrl =>
-      'data:text/html;base64,${base64Encode(Utf8Encoder().convert(kStripeHtmlPage))}';
+    return await _webViewController.evaluateJavascript(redirectToCheckoutJs);
+  }
 }
 
-const kStripeHtmlPage = '''
+const String kStripeHtmlPage = '''
 <!DOCTYPE html>
 <html>
 <script src="https://js.stripe.com/v3/"></script>
 <head><title>Stripe checkout</title></head>
 <body>
-Hello Webview
+Hello YouTube!!!
 </body>
 </html>
 ''';

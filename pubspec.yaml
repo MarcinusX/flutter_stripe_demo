@@ -10,7 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^3.0.10
-  webview_flutter: ^0.3.22+1
+  webview_flutter: ^1.0.0
+  js: ^0.6.2
 
 dev_dependencies:
   flutter_test:
