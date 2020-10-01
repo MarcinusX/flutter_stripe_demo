@@ -1,17 +1,15 @@
 @JS()
 library stripe;
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_stripe_demo/constants.dart';
 import 'package:js/js.dart';
 
-void redirectToCheckout(BuildContext context) {
-  Stripe(apiKey).redirectToCheckout(CheckoutOptions(
+void redirectToCheckout(BuildContext _) async {
+  final stripe = Stripe(apiKey);
+  stripe.redirectToCheckout(CheckoutOptions(
     lineItems: [
-      LineItem(
-        price: nikesPriceId,
-        quantity: 1,
-      )
+      LineItem(price: nikesPriceId, quantity: 1),
     ],
     mode: 'payment',
     successUrl: 'http://localhost:8080/#/success',
@@ -23,7 +21,7 @@ void redirectToCheckout(BuildContext context) {
 class Stripe {
   external Stripe(String key);
 
-  external redirectToCheckout(CheckoutOptions checkoutOptions);
+  external redirectToCheckout(CheckoutOptions options);
 }
 
 @JS()
@@ -36,8 +34,6 @@ class CheckoutOptions {
   external String get successUrl;
 
   external String get cancelUrl;
-
-  external String get sessionId;
 
   external factory CheckoutOptions({
     List<LineItem> lineItems,

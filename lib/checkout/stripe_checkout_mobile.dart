@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_stripe_demo/checkout/server_stub.dart';
 import 'package:flutter_stripe_demo/constants.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -53,7 +54,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String get initialUrl =>
       'data:text/html;base64,${base64Encode(Utf8Encoder().convert(kStripeHtmlPage))}';
 
-  Future<String> _redirectToStripe(String sessionId) async {
+  Future<void> _redirectToStripe(String sessionId) async {
     final redirectToCheckoutJs = '''
 var stripe = Stripe(\'$apiKey\');
     
@@ -64,7 +65,14 @@ stripe.redirectToCheckout({
 });
 ''';
 
-    return await _webViewController.evaluateJavascript(redirectToCheckoutJs);
+    try {
+      await _webViewController.evaluateJavascript(redirectToCheckoutJs);
+    } on PlatformException catch (e) {
+      if (!e.details.contains(
+          'JavaScript execution returned a result of an unsupported type')) {
+        rethrow;
+      }
+    }
   }
 }
 
