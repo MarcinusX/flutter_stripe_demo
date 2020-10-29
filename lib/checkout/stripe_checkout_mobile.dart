@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_stripe_demo/checkout/server_stub.dart';
@@ -51,8 +49,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  String get initialUrl =>
-      'data:text/html;base64,${base64Encode(Utf8Encoder().convert(kStripeHtmlPage))}';
+  String get initialUrl => 'https://marcinusx.github.io/test1/index.html';
 
   Future<void> _redirectToStripe(String sessionId) async {
     final redirectToCheckoutJs = '''
@@ -76,13 +73,3 @@ stripe.redirectToCheckout({
   }
 }
 
-const String kStripeHtmlPage = '''
-<!DOCTYPE html>
-<html>
-<script src="https://js.stripe.com/v3/"></script>
-<head><title>Stripe checkout</title></head>
-<body>
-Hello YouTube!!!
-</body>
-</html>
-''';
