@@ -48,8 +48,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ),
     );
   }
-
-  String get initialUrl => 'https://marcinusx.github.io/test1/index.html';
+  //loading screen with simple spinner.
+  String get initialUrl => 'https://syedecryptr.github.io/css-page-loader/';
 
   Future<void> _redirectToStripe(String sessionId) async {
     final redirectToCheckoutJs = '''
